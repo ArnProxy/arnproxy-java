@@ -16,7 +16,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 /** Server-side client. Never embed an API key in a public app. */
 public class Client {
- public static final String VERSION="1.1.0",BASE="https://www.arnproxy.com/account/api/v1/";
+ public static final String VERSION="1.1.1",BASE="https://www.arnproxy.com/account/api/v1/";
  private static final int MAX=2*1024*1024;
  private static final Gson JSON=new GsonBuilder().setStrictness(Strictness.STRICT).serializeNulls().create();
  private static final Pattern KEY=Pattern.compile("(?:[A-Za-z0-9]{32}|arnp_[a-f0-9]{16}_[a-f0-9]{64})"),OPERATION=Pattern.compile("[A-Za-z0-9_-]{16,100}"),REQUEST=Pattern.compile("[a-f0-9]{24}");

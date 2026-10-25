@@ -20,6 +20,17 @@ public final class ClientTest {
  }
  public static void main(String[] args)throws Exception {
   Gson json=new Gson();JsonObject contract=json.fromJson(Files.readString(Path.of(args[0])),JsonObject.class);JsonObject fixtures=json.fromJson(Files.readString(Path.of(args[1])),JsonObject.class);
+  // Public test recipes only; these bytes are never read from production.
+  for(JsonElement item:fixtures.getAsJsonArray("vectors")){
+   JsonObject vector=item.getAsJsonObject();
+   if(vector.has("secret_fixture")){
+    String tag=vector.get("secret_fixture").getAsString();
+    if(!Set.of("repeat_X_32","repeat_Y_32").contains(tag))throw new AssertionError("INVALID_TEST_FIXTURE");
+    byte[] bytes=new byte[32];Arrays.fill(bytes,(byte)(tag.equals("repeat_X_32")?'X':'Y'));
+    vector.addProperty("secret","whsec_"+Base64.getEncoder().encodeToString(bytes));
+   }
+  }
+
   check(contract.getAsJsonObject("resources").size()==77);
   for(var entry:contract.getAsJsonObject("resources").entrySet()){
    String name=entry.getKey();JsonObject spec=entry.getValue().getAsJsonObject();Map<String,Object> params=new LinkedHashMap<>();String path=spec.get("path").getAsString();if(path.contains("{id}"))params.put("id",123);params.put("q","ü & = ? /");String key=spec.get("idempotency").getAsBoolean()?OP:null;Mock c=new Mock();

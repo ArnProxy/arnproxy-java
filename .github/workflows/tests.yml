@@ -1,0 +1,16 @@
+name: SDK offline checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Synthetic contract and webhook tests
+        run: mvn -B test-compile org.codehaus.mojo:exec-maven-plugin:3.5.0:java -Dexec.mainClass=com.arnproxy.sdk.ClientTest -Dexec.classpathScope=test "-Dexec.args=resources.json tests/fixtures.json"
